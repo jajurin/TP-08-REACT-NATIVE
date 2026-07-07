@@ -13,6 +13,7 @@ import type { Publicaciones } from './componentes/interfaces/Publicaciones';
 import type { Perfiles } from './componentes/interfaces/Perfiles';
 import type { Comentarios } from './componentes/interfaces/Comentarios';
 
+
 interface QuoteApiResponse {
   quote: string;
   author: string;
@@ -32,7 +33,6 @@ export default function App() {
     const cargarDatos = async () => {
       setLoading(true);
       setError(null);
-
       try {
         const perfilesRespuestas = await Promise.all(
           Array.from({ length: CANTIDAD_PERFILES }, (_, i) =>
