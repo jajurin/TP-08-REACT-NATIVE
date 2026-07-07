@@ -1,4 +1,3 @@
-import './Publicacion.css'
 import { Publicaciones } from './interfaces/Publicaciones'
 
   interface PublicacionProps {

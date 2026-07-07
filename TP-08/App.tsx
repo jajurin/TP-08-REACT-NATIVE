@@ -1,13 +1,12 @@
 import { useEffect, useState } from 'react';
 import { View, ScrollView, StyleSheet, Text } from 'react-native';
-import { SafeAreaView } from 'react-native-safe-area-context';
-
+import { SafeAreaView } from 'react-native';
 import { api, apiComentarios } from './api';
 import Feed from './componentes/Home';
 //import PublicacionDetail from './Componentes/PublicacionDetail/PublicacionDetail';
 //import Encabezado from './Componentes/Encabezado/Encabezado';
 //import Stories from './Componentes/Stories/Stories';
-//import PerfilUsuario from './Componentes/perfilUsuario/perfilUsuario';
+import PerfilUsuario from './componentes/Perfil';
 //import Loading from './Componentes/Loader/Loader';
 
 import type { Publicaciones } from './componentes/interfaces/Publicaciones';
@@ -18,7 +17,7 @@ interface QuoteApiResponse {
   quote: string;
   author: string;
   category: string;
-}
+} 
 
 const CANTIDAD_PERFILES = 10;
 
@@ -125,7 +124,7 @@ export default function App() {
     <SafeAreaView style={styles.safeArea}>
       {/* <Encabezado /> */}
 
-      {/* {perfiles[7] && <PerfilUsuario Perfil={perfiles[7]} />} */}
+{perfiles[7] && <PerfilUsuario perfil={perfiles[7]} />} 
 
       {loading ? (
         <>
