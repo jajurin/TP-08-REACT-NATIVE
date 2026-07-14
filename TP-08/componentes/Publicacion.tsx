@@ -68,17 +68,17 @@ export default function Publicacion({
 
 function IconoLike({ activo }: { activo: boolean }) {
   return (
-    <Svg width={24} height={24} viewBox="0 0 20 20" fill="none">
+    <Svg width={26} height={26} viewBox="0 0 24 24" fill="none">
       <Path
-        d="M1.24264 8.24264L8 15L14.7574 8.24264C15.553 7.44699 16 6.36786 16 5.24264V5.05234C16 2.8143 14.1857 1 11.9477 1C10.7166 1 9.55233 1.55959 8.78331 2.52086L8 3.5L7.21669 2.52086C6.44767 1.55959 5.28338 1 4.05234 1C1.8143 1 0 2.8143 0 5.05234V5.24264C0 6.36786 0.44699 7.44699 1.24264 8.24264Z"
+        d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
         fill={activo ? '#ff3040' : 'none'}
         stroke={activo ? '#ff3040' : '#ffffff'}
-        strokeWidth={1.3}
+        strokeWidth={1.8}
+        strokeLinejoin="round"
       />
     </Svg>
   );
 }
-
 function IconoComentario() {
   return (
     <Svg width={24} height={24} viewBox="0 0 24 24" fill="none">

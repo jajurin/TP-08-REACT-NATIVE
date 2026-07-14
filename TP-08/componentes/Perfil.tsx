@@ -12,16 +12,14 @@ interface PerfilUsuarioProps {
 export default function PerfilUsuario({ perfil, onSelectPublicacion }: PerfilUsuarioProps) {
   return (
     <View style={{ flex: 1 }}>
-      <NavegadorSuperior/>
+      <NavegadorSuperior />
       <FlatList
         style={styles.container}
         contentContainerStyle={styles.contentContainer}
         data={perfil.publicaciones}
         keyExtractor={(item) => String(item.id)}
         numColumns={3}
-        // El header con avatar/bio/métricas va como ListHeaderComponent:
-        // así el scroll de toda la pantalla queda controlado por un único
-        // FlatList (evita el warning de "VirtualizedList inside ScrollView").
+        columnWrapperStyle={styles.columnWrapper}
         ListHeaderComponent={
           <View style={styles.header}>
             <LinearGradient
@@ -47,8 +45,6 @@ export default function PerfilUsuario({ perfil, onSelectPublicacion }: PerfilUsu
             <View style={styles.stats}>
               <StatBox valor={perfil.cantPubl} label="Publicaciones" />
               <StatBox valor={perfil.seguidores} label="Seguidores" />
-              {/* "seguidos" todavía no existe en la interface Perfiles.
-                  Sumalo ahí (ej: seguidos: number) y reemplazá este 0. */}
               <StatBox valor={0} label="Seguidos" />
             </View>
 
@@ -57,18 +53,33 @@ export default function PerfilUsuario({ perfil, onSelectPublicacion }: PerfilUsu
             </Pressable>
 
             <View style={styles.separador} />
+
+            {perfil.publicaciones.length > 0 && (
+              <View style={styles.gridHeader}>
+                <Text style={styles.gridHeaderTexto}>PUBLICACIONES</Text>
+              </View>
+            )}
           </View>
         }
         renderItem={({ item }: { item: Publicaciones }) => (
           <Pressable
-            style={styles.gridItem}
+            style={({ pressed }) => [styles.gridItem, pressed && styles.gridItemPresionado]}
             onPress={() => onSelectPublicacion?.(item.id)}
           >
             <Image source={{ uri: item.imagen }} style={styles.gridImagen} resizeMode="cover" />
+            <View style={styles.gridOverlay}>
+              <Text style={styles.gridLikes}>♥ {item.cantLike}</Text>
+            </View>
           </Pressable>
         )}
         ListEmptyComponent={
-          <Text style={styles.sinPublicaciones}>Todavía no hay publicaciones</Text>
+          <View style={styles.emptyState}>
+            <View style={styles.emptyIconCircle}>
+              <Text style={styles.emptyIcon}>📷</Text>
+            </View>
+            <Text style={styles.sinPublicacionesTitulo}>Todavía no hay publicaciones</Text>
+            <Text style={styles.sinPublicacionesSub}>Cuando subas fotos, van a aparecer acá</Text>
+          </View>
         }
       />
     </View>
@@ -84,7 +95,7 @@ function StatBox({ valor, label }: { valor: number; label: string }) {
   );
 }
 
-const GRID_GAP = 2;
+const GRID_GAP = 3;
 const GRID_ITEM_SIZE = `${100 / 3}%` as const;
 
 const styles = StyleSheet.create({
@@ -177,19 +188,78 @@ const styles = StyleSheet.create({
     height: StyleSheet.hairlineWidth,
     backgroundColor: '#23255a',
   },
+  gridHeader: {
+    width: '100%',
+    paddingTop: 14,
+    paddingBottom: 10,
+    paddingHorizontal: GRID_GAP,
+  },
+  gridHeaderTexto: {
+    color: '#8385b8',
+    fontSize: 11,
+    fontWeight: '700',
+    letterSpacing: 1.2,
+  },
+  columnWrapper: {
+    gap: GRID_GAP,
+    paddingHorizontal: GRID_GAP,
+  },
   gridItem: {
     width: GRID_ITEM_SIZE,
     aspectRatio: 1,
-    padding: GRID_GAP / 2,
+    marginBottom: GRID_GAP,
+    borderRadius: 6,
+    overflow: 'hidden',
+    backgroundColor: '#12133a',
+  },
+  gridItemPresionado: {
+    opacity: 0.75,
   },
   gridImagen: {
     width: '100%',
     height: '100%',
-    backgroundColor: '#1b1c4d',
   },
-  sinPublicaciones: {
-    color: '#b7b7d6',
+  gridOverlay: {
+    position: 'absolute',
+    bottom: 0,
+    left: 0,
+    right: 0,
+    paddingVertical: 4,
+    paddingHorizontal: 6,
+    backgroundColor: 'rgba(4, 4, 39, 0.55)',
+  },
+  gridLikes: {
+    color: 'white',
+    fontSize: 11,
+    fontWeight: '600',
+  },
+  emptyState: {
+    alignItems: 'center',
+    paddingTop: 50,
+    paddingHorizontal: 30,
+  },
+  emptyIconCircle: {
+    width: 64,
+    height: 64,
+    borderRadius: 32,
+    borderWidth: 1.5,
+    borderColor: '#3a3c7a',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 14,
+  },
+  emptyIcon: {
+    fontSize: 26,
+  },
+  sinPublicacionesTitulo: {
+    color: 'white',
+    fontSize: 15,
+    fontWeight: '600',
+    marginBottom: 4,
+  },
+  sinPublicacionesSub: {
+    color: '#8385b8',
+    fontSize: 13,
     textAlign: 'center',
-    marginTop: 30,
   },
 });

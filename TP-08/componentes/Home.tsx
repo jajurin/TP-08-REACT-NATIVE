@@ -1,6 +1,7 @@
 import { View, Text, FlatList, StyleSheet, useWindowDimensions } from 'react-native';
 import Publicacion from './Publicacion';
 import type { Publicaciones } from './interfaces/Publicaciones';
+import NavegadorSuperior from './NavegadorSuperior';
 // ⬆️ Ajustá esta ruta según dónde esté Home.tsx respecto a la carpeta interfaces.
 //    Por el screenshot, Home.tsx vive en TP-08/componentes, así que si
 //    interfaces/ está dentro de componentes/, la ruta relativa es './interfaces/Publicaciones'
@@ -20,7 +21,8 @@ export default function Feed({ publicaciones, onSelect, toggleLike }: FeedProps)
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>TRENDING</Text>
+     <NavegadorSuperior/>
+    <Text style={styles.title}>TRENDING</Text>
 
       <FlatList
         data={publicaciones}
