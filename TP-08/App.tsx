@@ -21,80 +21,73 @@ export default function App() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const cargarDatos = async () => {
-      setLoading(true);
-      setError(null);
-      try {
-        const perfilesRespuestas = await Promise.all(
-          Array.from({ length: CANTIDAD_PERFILES }, (_, i) =>
-            api.get(`/cat?width=100&height=100&random=${i}`)
-          )
-        );
+  const cargarDatos = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      // 1 solo pedido: trae 20 gatos de una (10 para perfiles + 10 para posts)
+     const listaGatos = await api.get('/api/cats?limit=20');
+const gatos = listaGatos.data as { id: string }[];
 
-        const nuevosPerfiles: Perfiles[] = perfilesRespuestas.map((respuesta, i) => ({
-          id: i,
-          imagen: respuesta.request.responseURL,
-          biografia: 'Amante de los gatos profesional',
-          cantPubl: 1,
-          nombreUser: `Mi__Gatito_${i + 1}`,
-          alias: `@gatito_${i + 1}`,
-          seguidores: Math.floor(Math.random() * 1000),
-          cantLike: Math.floor(Math.random() * 1000),
-          publicaciones: [],
-        }));
+const gatosPerfil = gatos.slice(0, CANTIDAD_PERFILES);
+const gatosPost = gatos.slice(CANTIDAD_PERFILES, CANTIDAD_PERFILES * 2);
 
-        setPerfiles(nuevosPerfiles);
+const nuevosPerfiles: Perfiles[] = gatosPerfil.map((gato, i) => ({
+  id: i,
+  imagen: `https://cataas.com/cat/${gato.id}?width=100&height=100`,
+  biografia: 'Amante de los gatos profesional',
+  cantPubl: 1,
+  nombreUser: `Mi__Gatito_${i + 1}`,
+  alias: `@gatito_${i + 1}`,
+  seguidores: Math.floor(Math.random() * 1000),
+  cantLike: Math.floor(Math.random() * 1000),
+  publicaciones: [],
+}));
 
-        const publicacionesRespuestas = await Promise.all(
-          Array.from({ length: CANTIDAD_PERFILES }, (_, i) =>
-            api.get(
-              `/cat/gif/says/Jaju y Alan?filter=mono&fontColor=orange&fontSize=20&type=square&random=${i + 1}`
-            )
-          )
-        );
+      setPerfiles(nuevosPerfiles);
 
-        const comentariosRespuestas = await Promise.all(
-          Array.from({ length: CANTIDAD_PERFILES }, () =>
-            apiComentarios.get<QuoteApiResponse[]>(
-              'https://api.api-ninjas.com/v2/quotes?categories=success%2Cwisdom&limit=5'
-            )
-          )
-        );
+      // 1 solo pedido para comentarios: 50 frases repartidas de a 5 por post
+      const comentariosRespuesta = await apiComentarios.get<QuoteApiResponse[]>(
+        'https://api.api-ninjas.com/v2/quotes?categories=success%2Cwisdom&limit=50'
+      );
+      const todasLasFrases = comentariosRespuesta.data;
 
-        const nuevasPublicaciones: Publicaciones[] = publicacionesRespuestas.map((respuesta, i) => {
-          const comentariosFake: Comentarios[] = comentariosRespuestas[i].data.map((quote, index) => ({
-            id: index,
-            texto: quote.quote,
-            fecha: new Date(),
-            usuario: nuevosPerfiles[Math.floor(Math.random() * nuevosPerfiles.length)],
-            likes: Math.floor(Math.random() * 100),
-          }));
+     const nuevasPublicaciones: Publicaciones[] = gatosPost.map((gato, i) => {
+  const frasesDelPost = todasLasFrases.slice(i * 5, i * 5 + 5);
+  const comentariosFake: Comentarios[] = frasesDelPost.map((quote, index) => ({
+    id: index,
+    texto: quote.quote,
+    fecha: new Date(),
+    usuario: nuevosPerfiles[Math.floor(Math.random() * nuevosPerfiles.length)],
+    likes: Math.floor(Math.random() * 100),
+  }));
 
-          return {
-            id: i,
-            perfil: nuevosPerfiles[i],
-            imagen: respuesta.request.responseURL,
-            nombreUsuario: nuevosPerfiles[i].nombreUser,
-            imagenUsuario: nuevosPerfiles[i].imagen,
-            descripcion: `Gatito numero ${i} en accion`,
-            cantLike: Math.floor(Math.random() * 1000),
-            comentarios: comentariosFake,
-            fecha: new Date(),
-            liked: false,
-          };
-        });
+  return {
+    id: i,
+    perfil: nuevosPerfiles[i],
+    // 👇 sacamos el /gif: usamos la imagen estática con los mismos filtros
+    imagen: `https://cataas.com/cat/${gato.id}?filter=mono&fontColor=orange&fontSize=20`,
+    nombreUsuario: nuevosPerfiles[i].nombreUser,
+    imagenUsuario: nuevosPerfiles[i].imagen,
+    descripcion: `Gatito numero ${i} en accion`,
+    cantLike: Math.floor(Math.random() * 1000),
+    comentarios: comentariosFake,
+    fecha: new Date(),
+    liked: false,
+  };
+});
 
-        setPublicaciones(nuevasPublicaciones);
-      } catch (err) {
-        console.error('Error cargando datos:', err);
-        setError('No pudimos cargar el contenido. Revisá tu conexión e intentá de nuevo.');
-      } finally {
-        setLoading(false);
-      }
-    };
+      setPublicaciones(nuevasPublicaciones);
+    } catch (err) {
+      console.error('Error cargando datos:', err);
+      setError('No pudimos cargar el contenido. Revisá tu conexión e intentá de nuevo.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
-    cargarDatos();
-  }, []);
+  cargarDatos();
+}, []);
 
  const handleSelectPublicacion = (idEl: number | null) => {
     if (idEl === null) {
