@@ -1,6 +1,6 @@
 import { View, Text, Image, Pressable, FlatList, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
-
+import NavegadorSuperior from './NavegadorSuperior';
 import type { Perfiles } from './interfaces/Perfiles';
 import type { Publicaciones } from './interfaces/Publicaciones';
 
@@ -11,64 +11,67 @@ interface PerfilUsuarioProps {
 
 export default function PerfilUsuario({ perfil, onSelectPublicacion }: PerfilUsuarioProps) {
   return (
-    <FlatList
-      style={styles.container}
-      contentContainerStyle={styles.contentContainer}
-      data={perfil.publicaciones}
-      keyExtractor={(item) => String(item.id)}
-      numColumns={3}
-      // El header con avatar/bio/métricas va como ListHeaderComponent:
-      // así el scroll de toda la pantalla queda controlado por un único
-      // FlatList (evita el warning de "VirtualizedList inside ScrollView").
-      ListHeaderComponent={
-        <View style={styles.header}>
-          <LinearGradient
-            colors={['#ff00c8', '#ff0055', '#ff8800']}
-            start={{ x: 0, y: 0 }}
-            end={{ x: 1, y: 1 }}
-            style={styles.gradientBorder}
-          >
-            <Image
-              source={{ uri: perfil.imagen }}
-              style={styles.perfilImg}
-              resizeMode="cover"
-            />
-          </LinearGradient>
+    <View style={{ flex: 1 }}>
+      <NavegadorSuperior/>
+      <FlatList
+        style={styles.container}
+        contentContainerStyle={styles.contentContainer}
+        data={perfil.publicaciones}
+        keyExtractor={(item) => String(item.id)}
+        numColumns={3}
+        // El header con avatar/bio/métricas va como ListHeaderComponent:
+        // así el scroll de toda la pantalla queda controlado por un único
+        // FlatList (evita el warning de "VirtualizedList inside ScrollView").
+        ListHeaderComponent={
+          <View style={styles.header}>
+            <LinearGradient
+              colors={['#ff00c8', '#ff0055', '#ff8800']}
+              start={{ x: 0, y: 0 }}
+              end={{ x: 1, y: 1 }}
+              style={styles.gradientBorder}
+            >
+              <Image
+                source={{ uri: perfil.imagen }}
+                style={styles.perfilImg}
+                resizeMode="cover"
+              />
+            </LinearGradient>
 
-          <Text style={styles.nombre}>{perfil.nombreUser}</Text>
-          <Text style={styles.alias}>{perfil.alias}</Text>
+            <Text style={styles.nombre}>{perfil.nombreUser}</Text>
+            <Text style={styles.alias}>{perfil.alias}</Text>
 
-          {!!perfil.biografia && (
-            <Text style={styles.bio}>{perfil.biografia}</Text>
-          )}
+            {!!perfil.biografia && (
+              <Text style={styles.bio}>{perfil.biografia}</Text>
+            )}
 
-          <View style={styles.stats}>
-            <StatBox valor={perfil.cantPubl} label="Publicaciones" />
-            <StatBox valor={perfil.seguidores} label="Seguidores" />
-            {/* "seguidos" todavía no existe en la interface Perfiles.
-                Sumalo ahí (ej: seguidos: number) y reemplazá este 0. */}
-            <StatBox valor={0} label="Seguidos" />
+            <View style={styles.stats}>
+              <StatBox valor={perfil.cantPubl} label="Publicaciones" />
+              <StatBox valor={perfil.seguidores} label="Seguidores" />
+              {/* "seguidos" todavía no existe en la interface Perfiles.
+                  Sumalo ahí (ej: seguidos: number) y reemplazá este 0. */}
+              <StatBox valor={0} label="Seguidos" />
+            </View>
+
+            <Pressable style={({ pressed }) => [styles.editarBtn, pressed && styles.editarBtnPresionado]}>
+              <Text style={styles.editarTexto}>Editar perfil</Text>
+            </Pressable>
+
+            <View style={styles.separador} />
           </View>
-
-          <Pressable style={({ pressed }) => [styles.editarBtn, pressed && styles.editarBtnPresionado]}>
-            <Text style={styles.editarTexto}>Editar perfil</Text>
+        }
+        renderItem={({ item }: { item: Publicaciones }) => (
+          <Pressable
+            style={styles.gridItem}
+            onPress={() => onSelectPublicacion?.(item.id)}
+          >
+            <Image source={{ uri: item.imagen }} style={styles.gridImagen} resizeMode="cover" />
           </Pressable>
-
-          <View style={styles.separador} />
-        </View>
-      }
-      renderItem={({ item }: { item: Publicaciones }) => (
-        <Pressable
-          style={styles.gridItem}
-          onPress={() => onSelectPublicacion?.(item.id)}
-        >
-          <Image source={{ uri: item.imagen }} style={styles.gridImagen} resizeMode="cover" />
-        </Pressable>
-      )}
-      ListEmptyComponent={
-        <Text style={styles.sinPublicaciones}>Todavía no hay publicaciones</Text>
-      }
-    />
+        )}
+        ListEmptyComponent={
+          <Text style={styles.sinPublicaciones}>Todavía no hay publicaciones</Text>
+        }
+      />
+    </View>
   );
 }
 

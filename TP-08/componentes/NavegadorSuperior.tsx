@@ -1,35 +1,35 @@
 import { View, Pressable, StyleSheet } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import Svg, { Path } from 'react-native-svg';
 
-const ITEMS = [
+const RUTAS = [
   { nombre: 'Home', ruta: 'Home' },
   { nombre: 'Explore', ruta: 'Explore' },
-  { nombre: 'Reels', ruta: 'Reels' },
-  { nombre: 'Igtv', ruta: 'Igtv' },
-  { nombre: 'Notification', ruta: 'Notification' },
   { nombre: 'Perfil', ruta: 'Perfil' },
 ] as const;
 
-export default function NavegadorInferior() {
+export default function NavegadorSuperior() {
   const navigation = useNavigation<any>();
   const route = useRoute();
 
   return (
-    <View style={styles.container}>
-      {ITEMS.map((item) => {
-        const activo = route.name === item.ruta;
-        return (
-          <Pressable
-            key={item.ruta}
-            style={styles.item}
-            onPress={() => navigation.navigate(item.ruta)}
-          >
-            <Icono nombre={item.nombre} color={activo ? '#ff3ea5' : '#b7b7d6'} />
-          </Pressable>
-        );
-      })}
-    </View>
+    <SafeAreaView edges={['top']} style={styles.safe}>
+      <View style={styles.container}>
+        {RUTAS.map((item) => {
+          const activo = route.name === item.ruta;
+          return (
+            <Pressable
+              key={item.ruta}
+              style={styles.item}
+              onPress={() => navigation.navigate(item.ruta)}
+            >
+              <Icono nombre={item.nombre} color={activo ? '#ff3ea5' : '#b7b7d6'} />
+            </Pressable>
+          );
+        })}
+      </View>
+    </SafeAreaView>
   );
 }
 
@@ -86,12 +86,15 @@ function Icono({ nombre, color }: { nombre: string; color: string }) {
 }
 
 const styles = StyleSheet.create({
+  safe: {
+    backgroundColor: '#040427',
+  },
   container: {
     flexDirection: 'row',
     height: 60,
     backgroundColor: '#040427',
-    borderTopWidth: StyleSheet.hairlineWidth,
-    borderTopColor: '#23255a',
+    borderBottomWidth: StyleSheet.hairlineWidth,
+    borderBottomColor: '#23255a',
   },
   item: {
     flex: 1,

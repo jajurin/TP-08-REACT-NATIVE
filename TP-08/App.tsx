@@ -1,30 +1,21 @@
 import { useEffect, useState } from 'react';
-import { View, ScrollView, StyleSheet, Text } from 'react-native';
-import { SafeAreaView } from 'react-native';
 import { api, apiComentarios } from './api';
-import Feed from './componentes/Home';
-//import PublicacionDetail from './Componentes/PublicacionDetail/PublicacionDetail';
-//import Encabezado from './Componentes/Encabezado/Encabezado';
-//import Stories from './Componentes/Stories/Stories';
-import PerfilUsuario from './componentes/Perfil';
-//import Loading from './Componentes/Loader/Loader';
-
+import AppNavigator from './componentes/screens';
 import type { Publicaciones } from './componentes/interfaces/Publicaciones';
 import type { Perfiles } from './componentes/interfaces/Perfiles';
 import type { Comentarios } from './componentes/interfaces/Comentarios';
-
 
 interface QuoteApiResponse {
   quote: string;
   author: string;
   category: string;
-} 
+}
 
 const CANTIDAD_PERFILES = 10;
 
 export default function App() {
   const [publicaciones, setPublicaciones] = useState<Publicaciones[]>([]);
-  const [publicacionSeleccionada, setPublicacionSeleccionada] = useState<Publicaciones | null>(null);
+  const [publicacionSeleccionada, setPublicacionSeleccionada] = useState<Publicaciones | null>(null); 
   const [perfiles, setPerfiles] = useState<Perfiles[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -105,77 +96,33 @@ export default function App() {
     cargarDatos();
   }, []);
 
-  const handleSelectPublicacion = (id: number | null) => {
-    if (id === null) {
+ const handleSelectPublicacion = (idEl: number | null) => {
+    if (idEl === null) {
       setPublicacionSeleccionada(null);
       return;
     }
-    const encontrada = publicaciones.find((publi) => publi.id === id);
-    setPublicacionSeleccionada(encontrada ?? null);
+    const publiEncontrada = publicaciones.find(
+      (publi) => publi.id === idEl
+    );
+    setPublicacionSeleccionada(publiEncontrada ?? null);
   };
 
   const toggleLike = (id: number) => {
     setPublicaciones((prev) =>
-      prev.map((publi) => (publi.id === id ? { ...publi, liked: !publi.liked } : publi))
+      prev.map((publi) =>
+        publi.id === id
+          ? { ...publi, liked: !publi.liked }
+          : publi
+      )
     );
   };
 
   return (
-    <SafeAreaView style={styles.safeArea}>
-      {/* <Encabezado /> */}
-
-{perfiles[7] && <PerfilUsuario perfil={perfiles[7]} />} 
-
-      {loading ? (
-        <>
-          {/* <Loading /> */}
-          <Text>Cargando...</Text>
-        </>
-      ) : error ? (
-        <View style={styles.centrado}>
-          <Text style={styles.errorTexto}>{error}</Text>
-        </View>
-      ) : (
-        <ScrollView contentContainerStyle={styles.scrollContent}>
-          {/* <Stories Perfiles={perfiles} /> */}
-
-          <Feed
-            publicaciones={publicaciones}
-            onSelect={handleSelectPublicacion}
-            toggleLike={toggleLike}
-          />
-        </ScrollView>
-      )}
-
-      {/* {publicacionSeleccionada && (
-        <PublicacionDetail
-          PublicacioneElegida={publicacionSeleccionada}
-          onSelect={handleSelectPublicacion}
-          toggleLike={toggleLike}
-          Publicaciones={publicaciones}
-        />
-      )} */}
-    </SafeAreaView>
-  ); // ← cierra el return
-} // ← ✅ ESTA es la llave que faltaba: cierra la función App()
-
-const styles = StyleSheet.create({
-  safeArea: {
-    flex: 1,
-    backgroundColor: '#000',
-  },
-  scrollContent: {
-    paddingBottom: 24,
-  },
-  centrado: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  errorTexto: {
-    color: 'white',
-    fontSize: 16,
-    textAlign: 'center',
-  },
-});
+    <AppNavigator
+      perfil={perfiles[7]}
+      publicaciones={publicaciones}
+      onSelect={handleSelectPublicacion}
+      toggleLike={toggleLike}
+    />
+  );
+}
