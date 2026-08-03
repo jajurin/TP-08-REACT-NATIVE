@@ -1,22 +1,31 @@
 import { View, Text, Image, Pressable, FlatList, StyleSheet } from 'react-native';
 import { LinearGradient } from 'expo-linear-gradient';
+import { SafeAreaView } from 'react-native-safe-area-context';
+import { StatusBar } from 'expo-status-bar';
+import { useNavigation } from '@react-navigation/native';
 import NavegadorSuperior from './NavegadorSuperior';
 import type { Perfiles } from './interfaces/Perfiles';
 import type { Publicaciones } from './interfaces/Publicaciones';
 
 interface PerfilUsuarioProps {
   perfil: Perfiles;
-  onSelectPublicacion?: (id: number) => void;
+  publicaciones: Publicaciones[];
 }
 
-export default function PerfilUsuario({ perfil, onSelectPublicacion }: PerfilUsuarioProps) {
+export default function PerfilUsuario({ perfil, publicaciones }: PerfilUsuarioProps) {
+  const navigation = useNavigation<any>();
+  const publicacionesDelPerfil = publicaciones.filter(
+    (publi) => publi.perfil.id === perfil.id
+  );
+
   return (
-    <View style={{ flex: 1 }}>
+    <SafeAreaView style={styles.safe} edges={['bottom', 'left', 'right']}>
+      <StatusBar style="light" />
       <NavegadorSuperior />
       <FlatList
         style={styles.container}
         contentContainerStyle={styles.contentContainer}
-        data={perfil.publicaciones}
+        data={publicacionesDelPerfil}
         keyExtractor={(item) => String(item.id)}
         numColumns={3}
         columnWrapperStyle={styles.columnWrapper}
@@ -43,7 +52,7 @@ export default function PerfilUsuario({ perfil, onSelectPublicacion }: PerfilUsu
             )}
 
             <View style={styles.stats}>
-              <StatBox valor={perfil.cantPubl} label="Publicaciones" />
+              <StatBox valor={publicacionesDelPerfil.length} label="Publicaciones" />
               <StatBox valor={perfil.seguidores} label="Seguidores" />
               <StatBox valor={0} label="Seguidos" />
             </View>
@@ -54,7 +63,7 @@ export default function PerfilUsuario({ perfil, onSelectPublicacion }: PerfilUsu
 
             <View style={styles.separador} />
 
-            {perfil.publicaciones.length > 0 && (
+            {publicacionesDelPerfil.length > 0 && (
               <View style={styles.gridHeader}>
                 <Text style={styles.gridHeaderTexto}>PUBLICACIONES</Text>
               </View>
@@ -64,11 +73,13 @@ export default function PerfilUsuario({ perfil, onSelectPublicacion }: PerfilUsu
         renderItem={({ item }: { item: Publicaciones }) => (
           <Pressable
             style={({ pressed }) => [styles.gridItem, pressed && styles.gridItemPresionado]}
-            onPress={() => onSelectPublicacion?.(item.id)}
+            onPress={() => navigation.navigate('DetallePost', { postId: item.id })}
           >
             <Image source={{ uri: item.imagen }} style={styles.gridImagen} resizeMode="cover" />
             <View style={styles.gridOverlay}>
-              <Text style={styles.gridLikes}>♥ {item.cantLike}</Text>
+              <Text style={[styles.gridLikes, item.liked && styles.gridLikesActivo]}>
+                {item.liked ? '♥' : '♡'} {item.cantLike}
+              </Text>
             </View>
           </Pressable>
         )}
@@ -82,7 +93,7 @@ export default function PerfilUsuario({ perfil, onSelectPublicacion }: PerfilUsu
           </View>
         }
       />
-    </View>
+    </SafeAreaView>
   );
 }
 
@@ -99,6 +110,10 @@ const GRID_GAP = 3;
 const GRID_ITEM_SIZE = `${100 / 3}%` as const;
 
 const styles = StyleSheet.create({
+  safe: {
+    flex: 1,
+    backgroundColor: '#040427',
+  },
   container: {
     flex: 1,
     backgroundColor: '#040427',
@@ -232,6 +247,9 @@ const styles = StyleSheet.create({
     color: 'white',
     fontSize: 11,
     fontWeight: '600',
+  },
+  gridLikesActivo: {
+    color: '#ff3040',
   },
   emptyState: {
     alignItems: 'center',

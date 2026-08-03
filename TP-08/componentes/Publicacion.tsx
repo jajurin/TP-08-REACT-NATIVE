@@ -30,7 +30,6 @@ export default function Publicacion({
           />
           <View>
             <Text style={styles.nombreUsuario}>{publicacion.nombreUsuario}</Text>
-            <Text style={styles.ubicacion}>Ubicación simulada</Text>
           </View>
         </View>
 
@@ -61,10 +60,6 @@ export default function Publicacion({
     </Pressable>
   );
 }
-
-// --- Íconos ---
-// Misma idea que en PerfilUsuario: cada ícono en su propio mini-componente
-// para no ensuciar el JSX principal.
 
 function IconoLike({ activo }: { activo: boolean }) {
   return (
@@ -136,10 +131,7 @@ const styles = StyleSheet.create({
     fontSize: 14,
     fontWeight: '700',
   },
-  ubicacion: {
-    color: '#b7b7d6',
-    fontSize: 12,
-  },
+
   botones: {
     flexDirection: 'row',
     gap: 16,

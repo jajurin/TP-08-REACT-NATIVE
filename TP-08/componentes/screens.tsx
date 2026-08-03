@@ -3,7 +3,7 @@ import { createNativeStackNavigator } from '@react-navigation/native-stack';
 
 import Feed from './Home';
 import PerfilUsuario from './Perfil';
-import Publicacion from './Publicacion';
+import Detalle from './Detalle';
 import type { Perfiles } from './interfaces/Perfiles';
 import type { Publicaciones } from './interfaces/Publicaciones';
 
@@ -14,7 +14,7 @@ export type RootStackParamList = {
   Igtv: undefined;
   Notification: undefined;
   Perfil: undefined;
-  DetallePost: { post: any } | { postId: string };
+  DetallePost: { postId: Publicaciones['id'] };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -22,14 +22,14 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 interface AppNavigatorProps {
   perfil: Perfiles | undefined;
   publicaciones: Publicaciones[];
-  onSelect: (id: Publicaciones['id']) => void;
   toggleLike: (id: Publicaciones['id']) => void;
 }
 
-export default function AppNavigator({ perfil, publicaciones, onSelect, toggleLike }: AppNavigatorProps) {
+export default function AppNavigator({ perfil, publicaciones, toggleLike }: AppNavigatorProps) {
   return (
     <NavigationContainer>
       <Stack.Navigator
+        id="Root"
         initialRouteName="Perfil"
         screenOptions={{ headerShown: false }}
       >
@@ -37,14 +37,25 @@ export default function AppNavigator({ perfil, publicaciones, onSelect, toggleLi
           {() => (
             <Feed
               publicaciones={publicaciones}
-              onSelect={onSelect}
               toggleLike={toggleLike}
             />
           )}
         </Stack.Screen>
-        <Stack.Screen name="Explore" component={Publicacion} />
+
         <Stack.Screen name="Perfil">
-          {() => perfil ? <PerfilUsuario perfil={perfil} /> : null}
+        {() => (perfil ? <PerfilUsuario perfil={perfil} publicaciones={publicaciones} /> : null)}
+        </Stack.Screen>
+
+        <Stack.Screen
+          name="DetallePost"
+          options={{ presentation: 'modal' }}
+        >
+          {() => (
+            <Detalle
+              publicaciones={publicaciones}
+              toggleLike={toggleLike}
+            />
+          )}
         </Stack.Screen>
       </Stack.Navigator>
     </NavigationContainer>
